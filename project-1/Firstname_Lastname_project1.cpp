@@ -66,20 +66,19 @@ const std::string who_am_i() {
  * */
 template<typename T>
 void bubble_sort(vector<T> &list, bool descending) {
+    if (list.empty()) {
+        return; // Handle empty list case
+    }
+
+    for (int i = 0; i < list.size() - 1; ++i) {
+        for (int j = 0; j < list.size() - 1; ++j) {
+            if ((descending && list[j] < list[j + 1]) || (!descending && list[j] > list[j + 1])) {
+                swap(list[j], list[j + 1]);
+            }
+        }
+    }
     // Your code here!
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* Selection Sort 
@@ -100,21 +99,22 @@ void bubble_sort(vector<T> &list, bool descending) {
  * */
 template<typename T>
 void selection_sort(vector<T> &list, bool descending) {
+    if (list.empty()) {
+        return; // Handle empty list case
+    }
+    for (int i = 0; i < list.size() - 1; ++i) {
+        int min_index = i;
+        for (int j = i + 1; j < list.size(); ++j) {
+            if ((descending && list[j] > list[min_index]) || (!descending && list[j] < list[min_index])) {
+                min_index = j;
+            }
+        }
+        if (min_index != i) {
+            swap(list[i], list[min_index]);
+        }
+    }
     // Your code here!
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* Insertion Sort 
@@ -137,13 +137,22 @@ void selection_sort(vector<T> &list, bool descending) {
 //void insertion_sort(vector<T> &list, bool descending = false);
 template<typename T>
 void insertion_sort(vector<T> &list, bool descending) {
+    if (list.empty()) {
+        return; // Handle empty list case
+    }
+    
+    for(int i = 1; i < list.size(); ++i) {
+        T key = list[i];
+        int j = i - 1;
+
+        while (j >= 0 && ((descending && list[j] < key) || (!descending && list[j] > key))) {
+            list[j + 1] = list[j];
+            --j;
+        }
+        list[j + 1] = key;
+    }
     // Your code here!
 }
-
-
-
-
-
 
 
 /* Quicksort 
@@ -172,11 +181,6 @@ void quicksort(vector<T> &list, bool descending) {
 
 
 
-
-
-
-
-
 /* Merge Sort 
  *
  * 10 points
@@ -198,18 +202,6 @@ template<typename T>
 void merge_sort(vector<T> &list, bool decending) {
     // Your code here!
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -292,9 +284,6 @@ void radix_sort(vector<T> &list, unsigned int base, bool descending) {
 
 
 
-
-
-
 int main() {
     /**** STUDENT CODE HERE ****/ 
 
@@ -312,15 +301,15 @@ int main() {
      *     autograder will throw an error if you run it without uncommenting the code.
      */
 
-    //vector<int> test_list {1, 2, 3, 4, 5};
-    //vector<unsigned int> test_list2 {1, 2, 3, 4, 5};
-    //vector<StableChar> test_list3  {};
-    //vector<StableInt> test_list4 {};
-    //vector<StableString> test_list5 {};
-    //vector<short> test_list6  {};
-    //vector<unsigned short> test_list7  {};
-    //vector<long> test_list8  {};
-    //vector<unsigned long> test_list9  {};
+    vector<int> test_list {1, 2, 3, 4, 5};
+    vector<unsigned int> test_list2 {1, 2, 3, 4, 5};
+    vector<StableChar> test_list3  {};
+    vector<StableInt> test_list4 {};
+    vector<StableString> test_list5 {};
+    vector<short> test_list6  {};
+    vector<unsigned short> test_list7  {};
+    vector<long> test_list8  {};
+    vector<unsigned long> test_list9  {};
 
 
     //insertion_sort(test_list);
@@ -334,25 +323,25 @@ int main() {
     //insertion_sort(test_list9);
 
 
-    //selection_sort(test_list);
-    //selection_sort(test_list2);
-    //selection_sort(test_list3);
-    //selection_sort(test_list4);
-    //selection_sort(test_list5);
-    //selection_sort(test_list6);
-    //selection_sort(test_list7);
-    //selection_sort(test_list8);
-    //selection_sort(test_list9);
+    selection_sort(test_list);
+    selection_sort(test_list2);
+    selection_sort(test_list3);
+    selection_sort(test_list4);
+    selection_sort(test_list5);
+    selection_sort(test_list6);
+    selection_sort(test_list7);
+    selection_sort(test_list8);
+    selection_sort(test_list9);
 
-    //bubble_sort(test_list);
-    //bubble_sort(test_list2);
-    //bubble_sort(test_list3);
-    //bubble_sort(test_list4);
-    //bubble_sort(test_list5);
-    //bubble_sort(test_list6);
-    //bubble_sort(test_list7);
-    //bubble_sort(test_list8);
-    //bubble_sort(test_list9);
+    bubble_sort(test_list);
+    bubble_sort(test_list2);
+    bubble_sort(test_list3);
+    bubble_sort(test_list4);
+    bubble_sort(test_list5);
+    bubble_sort(test_list6);
+    bubble_sort(test_list7);
+    bubble_sort(test_list8);
+    bubble_sort(test_list9);
 
 
     //merge_sort(test_list);
