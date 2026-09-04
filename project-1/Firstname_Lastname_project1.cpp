@@ -39,7 +39,7 @@ using namespace std;
 
 /** This please add your name here as well **/
 const std::string who_am_i() {
-    return "Firstname_Lastname";
+    return "Adrian_Espino";
 }
 
 
@@ -140,7 +140,7 @@ void insertion_sort(vector<T> &list, bool descending) {
     if (list.empty()) {
         return; // Handle empty list case
     }
-    
+
     for(int i = 1; i < list.size(); ++i) {
         T key = list[i];
         int j = i - 1;
@@ -176,7 +176,44 @@ void insertion_sort(vector<T> &list, bool descending) {
  * */
 template<typename T>
 void quicksort(vector<T> &list, bool descending) {
-    // Your code here!
+    if (list.empty()) {
+        return; // Handle empty list case
+    }
+
+    //Random pivot selection
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<size_t> dis(0, list.size() - 1);
+    T pivot = list[dis(gen)];
+
+    vector<T> less;
+    vector<T> greater;
+    vector<T> equal;
+
+    for ( T &item : list) {
+        if (item <pivot) {
+            less.push_back(item);
+        } else if (item > pivot) {
+            greater.push_back(item);
+        } else {
+            equal.push_back(item);
+        }
+    }
+
+    quicksort(less, descending);
+    quicksort(greater, descending);
+
+    list.clear();
+    if (descending) {
+        list.insert(list.end(), greater.begin(), greater.end());
+        list.insert(list.end(), equal.begin(), equal.end());
+        list.insert(list.end(), less.begin(), less.end());
+    } else {
+        list.insert(list.end(), less.begin(), less.end());
+        list.insert(list.end(), equal.begin(), equal.end());
+        list.insert(list.end(), greater.begin(), greater.end());
+    }
+    // Your code here
 }
 
 
@@ -354,15 +391,15 @@ int main() {
     //merge_sort(test_list8);
     //merge_sort(test_list9);
 
-    //quicksort(test_list);
-    //quicksort(test_list2);
-    //quicksort(test_list3);
-    //quicksort(test_list4);
-    //quicksort(test_list5);
-    //quicksort(test_list6);
-    //quicksort(test_list7);
-    //quicksort(test_list8);
-    //quicksort(test_list9);
+    quicksort(test_list);
+    quicksort(test_list2);
+    quicksort(test_list3);
+    quicksort(test_list4);
+    quicksort(test_list5);
+    quicksort(test_list6);
+    quicksort(test_list7);
+    quicksort(test_list8);
+    quicksort(test_list9);
 
     //my_hybrid_sort(test_list);
     //my_hybrid_sort(test_list2);
