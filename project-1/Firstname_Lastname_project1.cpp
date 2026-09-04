@@ -69,7 +69,7 @@ void bubble_sort(vector<T> &list, bool descending) {
     if (list.size() <= 1) {
         return; // Base case: a list of size 0 or 1 is already sorted
     }
-
+     // swap adjacent elements if they are in the wrong order based on the descending flag
     for (int i = 0; i < list.size() - 1; ++i) {
         for (int j = 0; j < list.size() - 1; ++j) {
             if ((descending && list[j] < list[j + 1]) || (!descending && list[j] > list[j + 1])) {
@@ -102,7 +102,7 @@ void selection_sort(vector<T> &list, bool descending) {
     if (list.size() <= 1) {
         return; // Base case: a list of size 0 or 1 is already sorted
     }
-
+    // Find the minimum (or maximum) element in the remaining list and swap it with the first element
     for (int i = 0; i < list.size() - 1; ++i) {
         int min_index = i;
         for (int j = i + 1; j < list.size(); ++j) {
@@ -141,7 +141,7 @@ void insertion_sort(vector<T> &list, bool descending) {
     if (list.size() <= 1) {
         return; // Base case: a list of size 0 or 1 is already sorted
     }
-
+    // Go through the list and insert each elemnt into the correct position
     for(int i = 1; i < list.size(); ++i) {
         T key = list[i];
         int j = i - 1;
@@ -186,11 +186,11 @@ void quicksort(vector<T> &list, bool descending) {
     mt19937 gen(rd());
     uniform_int_distribution<size_t> dis(0, list.size() - 1);
     T pivot = list[dis(gen)];
-
+    // Partition the list into three parts: less than, greater than, and equal to the pivot
     vector<T> less;
     vector<T> greater;
     vector<T> equal;
-
+    // Distribute elements into the three partitions
     for ( T &item : list) {
         if (item <pivot) {
             less.push_back(item);
@@ -200,10 +200,10 @@ void quicksort(vector<T> &list, bool descending) {
             equal.push_back(item);
         }
     }
-
+    // Recursively sort the less and greater partitions
     quicksort(less, descending);
     quicksort(greater, descending);
-
+    // Clear the original list and concatenate the sorted partitions back into it
     list.clear();
     if (descending) {
         list.insert(list.end(), greater.begin(), greater.end());
@@ -299,7 +299,46 @@ void merge_sort(vector<T> &list, bool decending) {
  */
 template<typename T>
 void my_hybrid_sort(vector<T> &list, bool descending) {
-    // Your code here!
+    if (list.size() <= 1) {
+        return; // Base case: a list of size 0 or 1 is already sorted
+    }
+
+    size_t Threshold = 10; // Threshold for switching to insertion sort
+
+    if (list.size() <= Threshold) {
+       insertion_sort(list, descending); // Use insertion sort for small lists
+       return;
+   }
+
+    mt19937 gen(random_device{}());
+    uniform_int_distribution<size_t> dis(0, list.size() - 1);
+    T pivot = list[dis(gen)];
+
+    vector<T> less;
+    vector<T> greater;
+    vector<T> equal;
+
+    for (T &item : list) {
+        if (item < pivot) {
+            less.push_back(item);
+        } else if (item > pivot) {
+            greater.push_back(item);
+        } else {
+            equal.push_back(item);
+        }
+    }
+
+    list.clear();
+    if (descending) {
+        list.insert(list.end(), greater.begin(), greater.end());
+        list.insert(list.end(), equal.begin(), equal.end());
+        list.insert(list.end(), less.begin(), less.end());
+        } else {
+        list.insert(list.end(), less.begin(), less.end());
+        list.insert(list.end(), equal.begin(), equal.end());
+        list.insert(list.end(), greater.begin(), greater.end());
+        }
+      // Your code here!
 }
 
 
