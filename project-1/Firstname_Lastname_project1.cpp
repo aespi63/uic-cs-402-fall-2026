@@ -45,7 +45,7 @@ const std::string who_am_i() {
 
 /*** GROUP PROJECT ***/
 // Please list ALL of your other group members as comments below.
-//   Member 1
+//   Adrian Espino
 //   Member 2
 
 
@@ -66,8 +66,8 @@ const std::string who_am_i() {
  * */
 template<typename T>
 void bubble_sort(vector<T> &list, bool descending) {
-    if (list.empty()) {
-        return; // Handle empty list case
+    if (list.size() <= 1) {
+        return; // Base case: a list of size 0 or 1 is already sorted
     }
 
     for (int i = 0; i < list.size() - 1; ++i) {
@@ -99,9 +99,10 @@ void bubble_sort(vector<T> &list, bool descending) {
  * */
 template<typename T>
 void selection_sort(vector<T> &list, bool descending) {
-    if (list.empty()) {
-        return; // Handle empty list case
+    if (list.size() <= 1) {
+        return; // Base case: a list of size 0 or 1 is already sorted
     }
+
     for (int i = 0; i < list.size() - 1; ++i) {
         int min_index = i;
         for (int j = i + 1; j < list.size(); ++j) {
@@ -137,8 +138,8 @@ void selection_sort(vector<T> &list, bool descending) {
 //void insertion_sort(vector<T> &list, bool descending = false);
 template<typename T>
 void insertion_sort(vector<T> &list, bool descending) {
-    if (list.empty()) {
-        return; // Handle empty list case
+    if (list.size() <= 1) {
+        return; // Base case: a list of size 0 or 1 is already sorted
     }
 
     for(int i = 1; i < list.size(); ++i) {
@@ -176,8 +177,8 @@ void insertion_sort(vector<T> &list, bool descending) {
  * */
 template<typename T>
 void quicksort(vector<T> &list, bool descending) {
-    if (list.empty()) {
-        return; // Handle empty list case
+    if (list.size() <= 1) {
+        return; // Base case: a list of size 0 or 1 is already sorted
     }
 
     //Random pivot selection
@@ -237,6 +238,44 @@ void quicksort(vector<T> &list, bool descending) {
  * */
 template<typename T>
 void merge_sort(vector<T> &list, bool decending) {
+    if (list.size() <= 1) {
+        return; // Base case: a list of size 0 or 1 is already sorted
+    }
+
+    size_t mid = list.size() / 2;
+    vector<T> left(list.begin(), list.begin() + mid);
+    vector<T> right(list.begin() + mid, list.end());
+
+    // breaks the list into two halves and recursively sorts each half
+    merge_sort(left, decending);
+    merge_sort(right, decending);
+
+    list.clear();
+    size_t i = 0;
+    size_t j = 0;
+
+    //checks the condition for merging the two halves based on the decending flag
+    while(i < left.size() && j < right.size()) {
+       bool condition = decending ? (left[i] > right[j]) : (left[i] < right[j]);
+        if (condition) {
+            list.push_back(left[i]);
+            ++i;
+        } else {
+            list.push_back(right[j]);
+            ++j;
+        }
+    }
+
+        // appends remainder from either left or right to the end of the list
+        while (i < left.size()) {
+            list.push_back(left[i]);
+            ++i;
+        }
+        while (j < right.size()) {
+            list.push_back(right[j]);
+            ++j;
+        }
+    
     // Your code here!
 }
 
@@ -349,15 +388,15 @@ int main() {
     vector<unsigned long> test_list9  {};
 
 
-    //insertion_sort(test_list);
-    //insertion_sort(test_list2);
-    //insertion_sort(test_list3);
-    //insertion_sort(test_list4);
-    //insertion_sort(test_list5);
-    //insertion_sort(test_list6);
-    //insertion_sort(test_list7);
-    //insertion_sort(test_list8);
-    //insertion_sort(test_list9);
+    insertion_sort(test_list);
+    insertion_sort(test_list2);
+    insertion_sort(test_list3);
+    insertion_sort(test_list4);
+    insertion_sort(test_list5);
+    insertion_sort(test_list6);
+    insertion_sort(test_list7);
+    insertion_sort(test_list8);
+    insertion_sort(test_list9);
 
 
     selection_sort(test_list);
@@ -381,15 +420,15 @@ int main() {
     bubble_sort(test_list9);
 
 
-    //merge_sort(test_list);
-    //merge_sort(test_list2);
-    //merge_sort(test_list3);
-    //merge_sort(test_list4);
-    //merge_sort(test_list5);
-    //merge_sort(test_list6);
-    //merge_sort(test_list7);
-    //merge_sort(test_list8);
-    //merge_sort(test_list9);
+    merge_sort(test_list);
+    merge_sort(test_list2);
+    merge_sort(test_list3);
+    merge_sort(test_list4);
+    merge_sort(test_list5);
+    merge_sort(test_list6);
+    merge_sort(test_list7);
+    merge_sort(test_list8);
+    merge_sort(test_list9);
 
     quicksort(test_list);
     quicksort(test_list2);
