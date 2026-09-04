@@ -304,12 +304,12 @@ void my_hybrid_sort(vector<T> &list, bool descending) {
     }
 
     size_t Threshold = 10; // Threshold for switching to insertion sort
-
+    // If the list size is less than or equal to the threshold, use insertion sort
     if (list.size() <= Threshold) {
        insertion_sort(list, descending); // Use insertion sort for small lists
        return;
    }
-
+   // Use quicksort for larger lists
     mt19937 gen(random_device{}());
     uniform_int_distribution<size_t> dis(0, list.size() - 1);
     T pivot = list[dis(gen)];
@@ -394,7 +394,82 @@ void binary_radix_sort(vector<T> &list, bool descending) {
  */
 template<Integral T>
 void radix_sort(vector<T> &list, unsigned int base, bool descending) {
-    // Your code here!
+    
+    if (list.size() <= 1 || base < 2) {
+        return; // Base case: a list of size 0 or 1 is already sorted, or base is invalid
+    }
+    // Use unsigned type
+    using U = make_unsigned_t<T>; // Use unsigned type for calculations
+    // Separate positive and negative numbers into two separate lists
+    vector<U> pos;
+    vector<U> neg;
+    // Iterate through the list and separate positive and negative numbers
+    for (T &item : list) {
+        // If the type is signed and the item is negative, store it in the neg list as a positive value
+        if constexpr (is_signed_v<T>) {
+            if (item < 0) {
+            neg.push_back(U(0) - static_cast<U>(item)); // Store negative values as positive
+            continue;
+            }
+        }
+         pos.push_back(static_cast<U>(item));
+    }
+    // Sort the positive and negative lists using radix sort
+    auto get_max = [](const vector<U> &v) {
+        U max_val = 0;
+        for (const auto &item : v) {
+            if (item > max_val) {
+                max_val = item;
+            }
+        }
+        return max_val;
+    };
+    // Lambda function to perform radix sort on a vector of unsigned integers
+    auto sort_radix = [base, &get_max](vector<U> &v) {
+        if (v.size() <= 1) {
+            return; // Base case: a list of size 0 or 1 is already sorted
+        }
+        U max_val = get_max(v);
+
+        vector<vector<U>> buckets(base); // Create buckets for each digit
+        U divisor = 1; // Start with the least significant digit
+        // Continue sorting until the maximum value has been processed
+        while (true) {
+            
+            for (const U &item : v) {
+            buckets[(item / divisor) % base].push_back(item); // Place item in the appropriate bucket  
+            }
+
+            v.clear(); // Clear the original list
+            for (auto &bucket : buckets) {
+                for (U &item : bucket) {
+                    v.push_back(item); // Concatenate the buckets back into the original list
+                }
+            bucket.clear(); // Clear the bucket for the next iteration
+            }
+        
+
+            if (max_val / divisor < base) {
+                break; // If the maximum value has been processed, exit the loop
+            }
+            divisor *= base; // Move to the next significant digit
+        }
+    };
+    // Sort the positive and negative lists using the sort_radix lambda function
+    sort_radix(pos);
+    sort_radix(neg);
+    // Clear the original list and concatenate the sorted negative and positive lists back into it
+    list.clear();
+    for (size_t i = neg.size(); i > 0; --i) {
+        list.push_back(static_cast<T>(U(0) - neg[i - 1])); // Add negative numbers back in reverse order
+    } // Add negative numbers back in reverse order
+    for (U &item : pos) {
+        list.push_back(static_cast<T>(item)); // Add positive numbers back
+    }
+    // Reverse the list if descending order is required
+    if (descending) {
+        reverse(list.begin(), list.end()); // Reverse the list if descending order is required
+    }
 }
 
 
