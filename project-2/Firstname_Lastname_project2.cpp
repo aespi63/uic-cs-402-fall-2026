@@ -189,7 +189,8 @@ vector<unsigned int> birthday_attack_2(function<unsigned short(unsigned int)> ha
  *      - A Merkle tree is a complete binary tree with 2^n leaves, 
  *          where each node in the tree is labeled as follows.
  *          - Order each leaf, from left to right, as 0, 1, ..., 2^n - 1.
- *              Leaf i is labeled with hash_function(list[i])
+ *              Leaf i is labeled with hash_function(list[i] + "i").
+ *              Note that list[i] is a string, and "i" is the string representation of index i.
  *          - For each non-leaf node w with child nodes u, v and labels
  *              hash_u, hash_v, the label of w is hash_w = hash_function(hash_u || hash_v),
  *              where hash_u || hash_v denotes string concatenation.
@@ -224,7 +225,7 @@ string merkle_commit(const vector<string>& list, function<string(string)> hash_f
  *      - Intuitively, you can construct the proof as follows
  *          - In the complete binary tree representing the merkle root computation, 
  *              draw a leaf-to-root path the leaf list[i] to the root.
- *          - Add list[i] to the proof.
+ *          - Append [list[i], "i"] to the proof.
  *          - For every node on the root-to-leaf path that is not a leaf node:
  *              - add the label (i.e., hash) of its child that is NOT on the 
  *                  root to leaf path to the proof.
@@ -313,8 +314,8 @@ vector<string> merkle_open_position(
  *  Algorithm:
  *      - Given the string proof, you must now verify that it is consistent with the root.
  *      - Assuming the proof is in the correct order, verification proceeds as follows:
- *          - compute h = hash_function(proof[0])
- *          - for p in proof[1:] (i.e., to the end of the proof)
+ *          - compute h = hash_function(proof[0]+proof[1])
+ *          - for p in proof[2:] (i.e., to the end of the proof)
  *              - determine whether p is the left or right input to the hash function
  *              - compute h = hash_function(p || h) or hash_function(h || p) based on
  *                  the above decision
