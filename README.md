@@ -28,4 +28,5 @@ Here are the steps.
     This will specify a new remote repository named `upstream`, pointing to my repository.
     b. To sync changes with this repository, execute `git pull upstream <branch>`.
     For example, `git pull upstream main` pulls changes from the main branch, `git pull upstream project-2` pulls changes from the project-2 branch, etc.
+    c. This should not affect your usual `git push` and `git pull` workflow with respect to your own repository since `git push` is a shorthand for `git push/pull origin <branch>`. You will only be able to pull from `upstream` when you explicitly specify it.
 
