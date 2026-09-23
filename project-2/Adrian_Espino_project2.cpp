@@ -9,12 +9,12 @@
 #include "sha256.c"
 
 // be sure to change FIRSTNAME and LASTNAME with your own first and last name
-#include "Firstname_Lastname_project2.h"
+#include "Adrian_Espino_project2.h"
 
 using namespace std;
 
 const string who_am_i() {
-    return "Firstname_Lastname";
+    return "Adrian_Espino";
 }
 
 /****************

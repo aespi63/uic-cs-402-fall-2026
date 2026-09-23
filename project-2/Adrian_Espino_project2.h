@@ -1,7 +1,7 @@
 
 // be sure to change FIRSTNAME and LASTNAME with your own first and last name
-#ifndef FIRSTNAME_LASTNAME_PROJECT2
-#define FIRSTNAME_LASTNAME_PROJECT2
+#ifndef Adrian_Espino_PROJECT2
+#define Adrian_Espino_PROJECT2
 
 #include <functional>
 #include <string>
