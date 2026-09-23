@@ -26,7 +26,8 @@ Note you may have to handle merge conflicts, but I have tried to streamline the 
 Here are the steps.
     a. In your repository for the course projects, execute the command `git remote add upstream https://github.com/arblock-uic/uic-cs-402-fall-2026` (or if you are accessing GitHub using SSH keys, execute `git remote add upstream git@github.com:arblock-uic/uic-cs-402-fall-2026.git`).
     This will specify a new remote repository named `upstream`, pointing to my repository.
-    b. To sync changes with this repository, execute `git pull upstream <branch>`.
-    For example, `git pull upstream main` pulls changes from the main branch, `git pull upstream project-2` pulls changes from the project-2 branch, etc.
+    b. Now, with `upstream`, you can sync changes on a per-branch basis.
+    For example, if you are on the `main` branch in your local git repository, and you want to sync it with `upstream`, execute `git pull upstream main`.
+    However, if you want to sync changes to `project-1`, you **must** switch your local branch to `project-1` first by executing `git switch project-1`, and then execute `git pull upstream project-1`.
+    If you do not do this, and you execute `git pull upstream project-1` while on your local `main` branch, git will pull the changes from the `upstream project-1` branch **into** your local `main` branch!
     c. This should not affect your usual `git push` and `git pull` workflow with respect to your own repository since `git push` is a shorthand for `git push/pull origin <branch>`. You will only be able to pull from `upstream` when you explicitly specify it.
-
