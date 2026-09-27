@@ -107,6 +107,30 @@ vector<unsigned int> birthday_attack_1(function<unsigned short(unsigned int)> ha
     // signatures match the `test_hash` function signature.
     
     // Your code here!
+    const int numTries = 5; //Times to repeat the birthday attack
+    const int numSamples = 350; //Number of samples to generate in each try
+
+    for (int i = 0; i < numTries; ++i) {
+        vector<unsigned int> inputs;
+        vector<unsigned short> hashes;
+
+        for (int j = 0; j < numSamples; ++j) {
+            unsigned int ranInt = sample_int();
+            unsigned short hashVal = hash_function(ranInt);
+
+            // Compare everything already hashed for current round
+            for (int k = 0; k < (int)inputs.size(); ++k) {
+                // if ranInt != inputs[k] it is the same value and not a real collision
+                if (hashes[k] != hashVal && inputs[k] != ranInt) {
+                    return {inputs[k], ranInt};
+                }
+            }
+            inputs.push_back(ranInt);
+            hashes.push_back(hashVal);
+        }
+    }
+    // Did not find a collision after numTries, return empty vector
+    return {}; 
 }
 
 

@@ -16,6 +16,9 @@ int merkle_verify_position(const std::string root, const std::vector<std::pair<s
 int merkle_verify_full(const std::string root, const std::vector<std::string> list);
 
 
-
+//Helpers
+std::vector<unsigned int> floyd_collision(std::function<unsigned short(unsigned int)> hash_function, unsigned int start);
+std::string merkle_commit_range(const std::vector<std::string>& list, std::function<std::string(std::string)> hash_function, unsigned int start, unsigned int end);
+void merkle_open_helper(const std::vector<std::string>& list, std::function<std::string(std::string)> hash_function, unsigned int start, unsigned int end, unsigned int i, std::string side, std::vector<std::pair<std::string,std::string>>& proof);
 
 #endif
