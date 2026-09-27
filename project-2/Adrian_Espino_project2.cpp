@@ -385,8 +385,7 @@ int merkle_verify_position(
  *  Inputs:
  *      - string root: the Merkle root
  *      - vector<string> list: the list claimed to be Merkle hashed as root
- *      - function<string(string)> hash_function: a hash function from strings to strings
- *      - unsigned int i: the position list[i] to be opened.
+ *      - function<string(string)> hash_function: a hash function from strings to string
  *  Output:
  *      - int decision: the verifier decition to accept or reject
  *          output 0 if accept, and any other integer if reject
@@ -401,7 +400,7 @@ int merkle_verify_position(
  *          size n, where n is NOT a power of 2.
  */
 
-int merkle_verify_full(const string root, const vector<std::string> list) {
+int merkle_verify_full(const string root, const vector<std::string>& list, function<string(string)> hash_function) {
 }
 
 
