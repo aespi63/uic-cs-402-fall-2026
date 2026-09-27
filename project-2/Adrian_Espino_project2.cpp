@@ -184,8 +184,40 @@ vector<unsigned int> birthday_attack_2(function<unsigned short(unsigned int)> ha
     // signatures match the `test_hash` function signature.
     
     // Your code here!
+
+    // Starting from 0 first
+    vector<unsigned int> result = floyd_collision(hash_function, 0);
+
+    // If 0 is already on the cycle then turtle is the same as the hare at the end,
+    // which isn't a reall collision. The hash output is 16 bits, so 65535 and can never
+    // be a hash output. Starting from there guarantees the two values we get back are different.
+    if (result[0] == result[1]) {
+        result = floyd_collision(hash_function, 65535);
+    }
+    return result;
 }
 
+// helper function to find a collision using Floyd's cycle finding algorithm
+vector<unsigned int> floyd_collision(function<unsigned short(unsigned int)> hash_function, unsigned int start) {
+    // Part 1: turtle moves 1 step, and hare moves 2 steps until they meet
+    unsigned int turt = hash_function(start);
+    unsigned int hare = hash_function(hash_function(start));
+
+    while (turt != hare) {
+        turt = hash_function(turt);
+        hare = hash_function(hash_function(hare));
+    }
+
+    // Part 2: reset the turtle, move both 1 step until the next values are the same.
+    // This means that both are two different inputs with the same hash
+    turt = start;
+    while (hash_function(turt) != hash_function(hare)) {
+        turt = hash_function(turt);
+        hare = hash_function(hare);
+    }
+
+    return {turt, hare};
+}
 
 /* Merkle Trees
  *
