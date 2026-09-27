@@ -287,7 +287,7 @@ string merkle_commit_range(const vector<string>& list, function<string(string)> 
     unsigned int mid = start + (end - start + 1) / 2; 
     string left = merkle_commit_range(list, hash_function, start, mid);
     string right = merkle_commit_range(list, hash_function, mid, end);
-    
+
     return hash_function(left + right);
 }
 
@@ -388,9 +388,17 @@ vector<pair<string,string>> merkle_open_position(
     function<string(string)> hash_function, 
     const unsigned int i
 ) {
-    
-}
+   vector<pair<string,string>> proof;
+   
+   // i is assumed valid, but added a check anyway
+   if (list.size() == 0 || i >= list.size()) {
+        return proof;
+   }
 
+   // The top level ( size = 1) counts as "L" 
+   merkle_open_helper(list, hash_function, 0, list.size(), i, "L", proof);
+   return proof;
+}
 
 
  /* 3. The Positional Verify Algorithm (15 points)
