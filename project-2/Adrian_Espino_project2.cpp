@@ -262,7 +262,35 @@ vector<unsigned int> floyd_collision(function<unsigned short(unsigned int)> hash
 
 
 string merkle_commit(const vector<string>& list, function<string(string)> hash_function) {
+    // Nothing to commit
+    if (list.size() == 0) {
+        return "";
+    }
+
+    return merkle_commit_range(list, hash_function, 0, list.size());
 }
+
+// Computes the merkle root of the list recursively,
+// Since we are not copying anything the only memory used is the recursive stack,
+// which makes this O(log(n)) additional space. If the size isnt a power of 2
+// the left half just gets the extra element, so it still works for any n >= 1;
+string merkle_commit_range(const vector<string>& list, function<string(string)> hash_function, unsigned int start, unsigned int end) {
+
+    // a single leaf, label is hash(list[i] + "i")
+    if ( end - start == 1) {
+        return hash_function(list[start] + to_string(start));
+    }
+
+    // Otherwise, split the list into two halves
+    // Compute the merkle root of each half
+    // left half gets the extra element if not a power of 2
+    unsigned int mid = start + (end - start + 1) / 2; 
+    string left = merkle_commit_range(list, hash_function, start, mid);
+    string right = merkle_commit_range(list, hash_function, mid, end);
+    
+    return hash_function(left + right);
+}
+
 
  /* 2. The Positional Open Algorithm (20 points)
  *  Inputs:
