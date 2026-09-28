@@ -399,6 +399,29 @@ vector<pair<string,string>> merkle_open_position(
    merkle_open_helper(list, hash_function, 0, list.size(), i, "L", proof);
    return proof;
 }
+    // Helper for open position, works on list[start:end]
+    // side is wether this range is the left or the right child of the parent
+    // Needed for the first entry of the proof. The recursive call happens befoe pushing the sibling 
+    // This way it ends up ordered from leaf to root order.
+    void merkle_open_helper(const vector<string>& list, function<string(string)> hash_function, unsigned int start, unsigned int end, unsigned int i, string side, vector<pair<string,string>> & proof) {
+        if (end - start ==1) {
+            proof.push_back({side, list[i]});
+            return;
+        }
+
+        // split the same way so that it matches with merkle_commit_range
+        unsigned int mid = start + (end - start + 1) / 2;
+
+        if (i < mid) {
+            //i is in the left half, sibling is the right half
+            merkle_open_helper(list, hash_function, start, mid, i, "L", proof);
+            proof.push_back({"R", merkle_commit_range(list, hash_function, mid, end)});
+        } else {
+            // i is in the right half, sibling is the left half
+            merkle_open_helper(list, hash_function, mid, end, i, "R", proof);
+            proof.push_back({"L", merkle_commit_range(list, hash_function, start, mid)});
+        }
+    }
 
 
  /* 3. The Positional Verify Algorithm (15 points)
