@@ -121,7 +121,7 @@ vector<unsigned int> birthday_attack_1(function<unsigned short(unsigned int)> ha
             // Compare everything already hashed for current round
             for (int k = 0; k < (int)inputs.size(); ++k) {
                 // if ranInt != inputs[k] it is the same value and not a real collision
-                if (hashes[k] != hashVal && inputs[k] != ranInt) {
+                if (hashes[k] == hashVal && inputs[k] != ranInt) {
                     return {inputs[k], ranInt};
                 }
             }
@@ -469,6 +469,32 @@ int merkle_verify_position(
     function<string(string)> hash_function, 
     const unsigned int i
 ) {
+    // An empty proof can't prove anything
+    if (proof.size() == 0) {
+        return 1;
+    }
+
+    // The first entry is the value and we hash it with its index
+    string id = hash_function(proof[0].second + to_string(i));
+
+    for (int i = 1; i < (int)proof.size(); ++i) {
+        if (proof[i].first == "L") {
+            // Given the left child label, ours goes on the right
+            id = hash_function(proof[i].second + id);
+        } else if (proof[i].first == "R") {
+            // Given the right child label, ours goes on the left
+            id = hash_function(id + proof[i].second);
+        } else {
+            // Neither L or R
+            return 1;
+        }
+    }
+
+    if (id == root) {
+        return 0;
+    }
+
+    return 1;
 }
 
 
@@ -492,6 +518,13 @@ int merkle_verify_position(
  */
 
 int merkle_verify_full(const string root, const vector<std::string>& list, function<string(string)> hash_function) {
+    // No hash, we use SHA256
+    string computed = merkle_commit(list, hash_function);
+
+    if ( computed == root) {
+        return 0;
+    }
+    return 1;
 }
 
 
@@ -539,5 +572,40 @@ const vector<pair<string,string>> test_vec3_proof_of_3 = {
 // https://www.cipherdecipher.com/tools/merkle-proof-verifier
 
 int main() {
+    // birthday attack 1
+    vector<unsigned int> out1 = birthday_attack_1(test_hash);
+    if (out1.size() == 2) {
+        cout << "birthday_attack_1: " << out1[0] << " " << out1[1]
+             << " -> " << test_hash(out1[0]) << " " << test_hash(out1[1]) << endl;
+    } else {
+        cout << "birthday_attack_1: no collision found" << endl;
+    }
+
+    // birthday attack 2
+    vector<unsigned int> out2 = birthday_attack_2(test_hash);
+    cout << "birthday_attack_2: " << out2[0] << " " << out2[1]
+         << " -> " << test_hash(out2[0]) << " " << test_hash(out2[1]) << endl;
+
+    // merkle commit
+    cout << "commit vec1: " << (merkle_commit(test_vec1, SHA256::hashString) == test_vec1_merkle_root ? "PASS" : "FAIL") << endl;
+    cout << "commit vec2: " << (merkle_commit(test_vec2, SHA256::hashString) == test_vec2_merkle_root ? "PASS" : "FAIL") << endl;
+    cout << "commit vec3: " << (merkle_commit(test_vec3, SHA256::hashString) == test_vec3_merkle_root ? "PASS" : "FAIL") << endl;
+
+    // merkle open
+    cout << "open vec1[2]: " << (merkle_open_position(test_vec1, SHA256::hashString, 2) == test_vec1_proof_of_2 ? "PASS" : "FAIL") << endl;
+    cout << "open vec2[1]: " << (merkle_open_position(test_vec2, SHA256::hashString, 1) == test_vec2_proof_of_1 ? "PASS" : "FAIL") << endl;
+    cout << "open vec3[3]: " << (merkle_open_position(test_vec3, SHA256::hashString, 3) == test_vec3_proof_of_3 ? "PASS" : "FAIL") << endl;
+
+    // merkle verify position (0 = accept)
+    cout << "verify vec1[2]: " << (merkle_verify_position(test_vec1_merkle_root, test_vec1_proof_of_2, SHA256::hashString, 2) == 0 ? "PASS" : "FAIL") << endl;
+    cout << "verify vec2[1]: " << (merkle_verify_position(test_vec2_merkle_root, test_vec2_proof_of_1, SHA256::hashString, 1) == 0 ? "PASS" : "FAIL") << endl;
+    cout << "verify vec3[3]: " << (merkle_verify_position(test_vec3_merkle_root, test_vec3_proof_of_3, SHA256::hashString, 3) == 0 ? "PASS" : "FAIL") << endl;
+    // wrong index should get rejected
+    cout << "verify vec1 wrong index: " << (merkle_verify_position(test_vec1_merkle_root, test_vec1_proof_of_2, SHA256::hashString, 3) != 0 ? "PASS" : "FAIL") << endl;
+
+    // merkle verify full
+    cout << "full vec1: " << (merkle_verify_full(test_vec1_merkle_root, test_vec1, SHA256::hashString) == 0 ? "PASS" : "FAIL") << endl;
+    cout << "full vec1 wrong root: " << (merkle_verify_full(test_vec2_merkle_root, test_vec1, SHA256::hashString) != 0 ? "PASS" : "FAIL") << endl;
+
     return 0;
 }
