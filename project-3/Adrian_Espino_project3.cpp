@@ -261,6 +261,36 @@ TreeNode* bits_to_tree(const vector<bool>& bits) {
     if (balance != 0) {
         return nullptr;  // never came all the way back up
     }
+
+    int next_id = 0;
+    TreeNode* root = new TreeNode{next_id++, nullptr, nullptr};
+
+    // Empty bits -> loop below doesn't run -> single root node, as required.
+    vector<TreeNode*> path = {root};
+    vector<TreeNode*> last_child = {nullptr};
+
+    for (bool b : bits) {
+        if (b) {
+            TreeNode* child = new TreeNode{next_id++, nullptr, nullptr};
+            TreeNode* parent = path.back();
+
+            if (last_child.back() == nullptr) {
+                parent->first_child = child;            // parent's first child
+            } else {
+                last_child.back()->next_sibling = child; // later child -> sibling link
+            }
+            last_child.back() = child;
+
+            // Step down into the new node; it has no children yet.
+            path.push_back(child);
+            last_child.push_back(nullptr);
+        } else {
+            // Step back up. Validation guarantees we never pop the root.
+            path.pop_back();
+            last_child.pop_back();
+        }
+    }
+    return root;
 }
 
 
