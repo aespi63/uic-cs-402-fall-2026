@@ -4,12 +4,12 @@
 #include <iostream>
 
 // be sure to change FIRSTNAME and LASTNAME with your own first and last name
-#include "Firstname_Lastname_project3.h"
+#include "Adrian_Espino_project3.h"
 
 using namespace std;
 
 const string who_am_i() {
-    return "Firstname_Lastname";
+    return "Adrian Espino";
 }
 
 
@@ -138,6 +138,45 @@ const string who_am_i() {
 // Do not modify this function signature.
 vector<int> weird_traversal(TreeNode* root) {
     // Your code here!
+    vector<int> result;
+    if (root == nullptr) {
+        return result;
+    }
+
+    vector<TreeNode*> nodes;   // BFS queue (nodes in visit order)
+    vector<int> depths;        // depths[k] is the depth of nodes[k]
+    vector<int> odd_ids;       // odd-layer ids, in BFS order
+
+    nodes.push_back(root);
+    depths.push_back(0);
+
+    size_t front = 0;          // index of the next node to process
+    while (front < nodes.size()) {
+        TreeNode* node = nodes[front];
+        int depth = depths[front];
+        front++;
+
+        if (depth % 2 == 0) {
+            result.push_back(node->id);
+        } else {
+            odd_ids.push_back(node->id);
+        }
+
+        // In first-child/next-sibling form, a node's children are its
+        // first_child followed by that child's chain of next_siblings.
+        for (TreeNode* child = node->first_child; child != nullptr; child = child->next_sibling) {
+            nodes.push_back(child);
+            depths.push_back(depth + 1);
+        }
+    }
+
+    // Walk the odd ids backwards: deepest odd layer first, right-most first.
+    for (size_t k = odd_ids.size(); k > 0; k--) {
+        result.push_back(odd_ids[k - 1]);
+    }
+
+    return result;
+
 }
 
 
@@ -207,6 +246,21 @@ vector<int> weird_traversal(TreeNode* root) {
 
 // Do not modify this fuction signature
 TreeNode* bits_to_tree(const vector<bool>& bits) {
+    // Validation pass over the bit vector (not the tree)
+    // Valid iff: even length, no prefix has more 0s than 1s, and the totals balance.
+    if (bits.size() % 2 != 0) {
+        return nullptr;
+    }
+    int balance = 0;
+    for (bool b : bits) {
+        balance += b ? 1 : -1;
+        if (balance < 0) {
+            return nullptr;  // tried to go "up" from the root
+        }
+    }
+    if (balance != 0) {
+        return nullptr;  // never came all the way back up
+    }
 }
 
 

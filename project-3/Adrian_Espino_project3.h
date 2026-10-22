@@ -1,6 +1,6 @@
 
-#ifndef FIRSTNAME_LASTNAME_PROJECT3
-#define FIRSTNAME_LASTNAME_PROJECT3
+#ifndef ADRIAN_ESPINO_PROJECT3
+#define ADRIAN_ESPINO_PROJECT3
 
 #include <vector>
 #include <string>
@@ -29,6 +29,12 @@ struct ParseTreeNode {
 // function delcarations
 vector<int> weird_traversal(TreeNode* root);
 TreeNode* bits_to_tree(const vector<bool>& bits);
+ParseTreeNode* build_parse_tree(const string& expr);
+
+// Helpers
+ParseTreeNode* make_parse_node(char val, ParseTreeNode* left, ParseTreeNode* right);
+ParseTreeNode* parse_expr(const string& expr, size_t& index);
+ParseTreeNode* parse_unary(const string& expr, size_t& index);
 
 #endif
 
