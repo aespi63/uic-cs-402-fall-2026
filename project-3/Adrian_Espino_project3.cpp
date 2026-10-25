@@ -398,10 +398,121 @@ TreeNode* bits_to_tree(const vector<bool>& bits) {
 
 // Do not modify this function signature
 ParseTreeNode* build_parse_tree(const string& expr) {
+    size_t index = 0;
+    return parse_expr(expr, index);
 }
 
+ParseTreeNode* parse_expr(const string& expr, size_t& index) {
+    ParseTreeNode* left = parse_unary(expr, index);
+    
+    while (index < expr.size() && (expr[index] == AND || expr[index] == OR)) {
+        char op = expr[index];
+        index++;  // consume operator
+        ParseTreeNode* right = parse_unary(expr, index);
+        left = make_parse_node(op, left, right); // grow tree to the left
+    }
+
+    // Stops at end of string or at a ')' that belongs to the caller.
+    return left;
+}
+
+ParseTreeNode* make_parse_node(char val, ParseTreeNode* left, ParseTreeNode* right) {
+    return new ParseTreeNode{val, left, right};
+}
+
+ParseTreeNode* parse_unary(const string& expr, size_t& index) {
+    if (index >= expr.size()) {
+        return nullptr;
+    }
+
+    char c = expr[index];
+
+    if (c == NOT) {
+        index++;  // consume '~'
+        // NOT applies to the next unary term only (tighter than ^ and |).
+        // Recursing on parse_unary also handles stacked NOTs like ~~a.
+        // Spec: NOT nodes keep the operand on the left, right stays null.
+        return make_parse_node(NOT, parse_unary(expr, index), nullptr);
+    }
+
+    if (c == '(') {
+        index++;  // consume '('
+        ParseTreeNode* inner = parse_expr(expr, index);
+        if (index < expr.size() && expr[index] == ')') {
+            index++;  // consume ')'
+        }
+        // Parentheses don't get their own node; they only shape the tree.
+        return inner;
+    }
+
+    // Otherwise it's a variable (a-z / A-Z): a leaf.
+    index++;
+    return make_parse_node(c, nullptr, nullptr);
+}
+
+// Prints the parse tree in a way that shows the structure of the tree.
+// For example, the tree for c|(a^b) would be printed as |(c,^(a,b))
+void print_parse(ParseTreeNode* n) {
+    if (n == nullptr) return;
+    cout << n->val;
+    if (n->left_child || n->right_child) {
+        cout << "(";
+        print_parse(n->left_child);
+        if (n->right_child) {
+            cout << ",";
+            print_parse(n->right_child);
+        }
+        cout << ")";
+    }
+}
+
+void print_vec(const vector<int>& v) {
+    cout << "[";
+    for (size_t k = 0; k < v.size(); k++) {
+        cout << v[k] << (k + 1 < v.size() ? ", " : "");
+    }
+    cout << "]\n";
+}
 
 int main() {
+    // Problem 2 + Problem 1 together: build the spec's 6-node example and
+    // weird-traverse it. Expected tree: 0 -> {1, 2, 3}, 3 -> {4, 5}
+    // Even layers: 0, 4, 5   Odd layer (reversed): 3, 2, 1
+    vector<bool> bits = {1, 0, 1, 0, 1, 1, 0, 1, 0, 0};
+    TreeNode* t = bits_to_tree(bits);
+    print_vec(weird_traversal(t));                   // [0, 4, 5, 3, 2, 1]
+
+    // The big example from the Problem 1 spec, built by hand with
+    // a=10, b=11, c=12. Expected: [0, 4, 5, 12, 11, 10, 9, 8, 7, 6, 3, 2, 1]
+    TreeNode n[13];
+    for (int k = 0; k < 13; k++) {
+        n[k].id = k;
+        n[k].first_child = nullptr;
+        n[k].next_sibling = nullptr;
+    }
+    n[0].first_child = &n[1];
+    n[1].next_sibling = &n[2];
+    n[2].next_sibling = &n[3];
+    n[2].first_child = &n[4];
+    n[3].first_child = &n[5];
+    n[4].first_child = &n[6];
+    n[6].next_sibling = &n[7];
+    n[7].next_sibling = &n[8];
+    n[5].first_child = &n[9];
+    n[9].next_sibling = &n[10];
+    n[10].next_sibling = &n[11];
+    n[11].next_sibling = &n[12];
+    print_vec(weird_traversal(&n[0]));
+
+    // Invalid encodings should give nullptr.
+    cout << (bits_to_tree({0, 1}) == nullptr) << "\n";      // 1
+    cout << (bits_to_tree({1, 1, 0}) == nullptr) << "\n";   // 1
+
+    // Problem 3 examples from the spec.
+    print_parse(build_parse_tree("c|(a^b)"));        cout << "\n";  // |(c,^(a,b))
+    print_parse(build_parse_tree("a|b^c"));          cout << "\n";  // ^(|(a,b),c)
+    print_parse(build_parse_tree("~(A^b)^(c|~z)"));  cout << "\n";  // ^(~(^(A,b)),|(c,~(z)))
+    print_parse(build_parse_tree("~(A^(c|~(d^e)^F)|~z)")); cout << "\n";
 
     return 0;
 }
