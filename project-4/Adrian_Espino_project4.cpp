@@ -1,12 +1,13 @@
 
 // be sure to change FIRSTNAME and LASTNAME with your own first and last name
-#include "Firstname_Lastname_project4.h"
+#include "Adrian_Espino_project4.h"
 #include <string>
+#include <queue>
 
 using namespace std;
 
 const string who_am_i() {
-    return "Firstname_Lastname";
+    return "Adrian_Espino";
 }
 
 /****************
@@ -71,6 +72,44 @@ const string who_am_i() {
 
 vector<int> topological_sort(int n, vector<Edge> edges) {
     // Your code here!
+    vector<vector<int>> adj(n);
+    vector<int> indegree(n, 0);
+    // Make an adjacency list and indegree vector
+    for (const Edge& e : edges) {
+        adj[e.from].push_back(e.to);
+        indegree[e.to]++;
+    }
+
+    vector<int> result;
+    queue<int> q;
+    // Add nodes with no incoming edges to the queue
+    for (int i = 0; i < n; i++) {
+        if (indegree[i] == 0) {
+            q.push(i);
+        }
+    }
+    // While the list is not empty we store the first node in the que
+    // and pop it off the que and add it to the result vector.
+    // Then we decrement the indegree of all the nodes connected to it and
+    // if any of those nodes have no incoming edges we add them to the que
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        result.push_back(u);
+
+        for (int v : adj[u]) {
+            indegree[v]--;
+            if (indegree[v] == 0) {
+                q.push(v);
+            }
+        }
+    }
+
+    if (result.size() != n) {
+        return {}; // No topological sort exists (graph has a cycle)
+    }
+
+    return result;
 }
 
 
@@ -102,6 +141,7 @@ vector<int> topological_sort(int n, vector<Edge> edges) {
  *
  */
 vector<int> dag_single_source(int n, vector<Edge> edges, int source) {
+    //your code here!
 }
 
 
