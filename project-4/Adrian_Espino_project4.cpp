@@ -3,6 +3,9 @@
 #include "Adrian_Espino_project4.h"
 #include <string>
 #include <queue>
+#include <cmath>
+#include <algorithm>
+#include <limits>
 
 using namespace std;
 
@@ -142,6 +145,32 @@ vector<int> topological_sort(int n, vector<Edge> edges) {
  */
 vector<int> dag_single_source(int n, vector<Edge> edges, int source) {
     //your code here!
+    // Get the topological order of the graph
+    vector<int> order = topological_sort(n, edges);
+    // Make all distances INT_MAX and set the source distance to 0
+    vector<int> dist(n, INT_MAX);
+    dist[source] = 0;
+    // Make an adjacency list of the grpah 
+    vector<vector<Edge>> adj(n);
+    for (const Edge& e : edges) {
+        adj[e.from].push_back(e);
+    }
+    // For each node in the topological order, we check if the distance to that node
+    // is INT_MAX, if it is we continue to the next node. If it is  not, we check
+    // all the edges connected to that node and check if the distance to the node
+    // plus the weight of the edge is less than the distance to the node connected
+    // to the edhe. 
+    for (int u : order) {
+        if (dist[u] == INT_MAX) {
+            continue;
+        }
+        for (const Edge& e : adj[u]) {
+            if (dist[u] + e.weight < dist[e.to]) {
+                dist[e.to] = dist[u] + e.weight;
+            }
+        }
+    }
+    return dist;
 }
 
 
@@ -177,7 +206,52 @@ vector<Node> dijkstras_algorithm(int n, vector<Edge> edges, int source) {
     // Your code here!
     // Note: see the LeetCode from in-class for the problem "Cheapest Flights
     // K stops" to see how you can create a priority_queue with the Node struct.
-    
+
+    // make an adjacency list of the graph
+    vector<vector<Edge>> adj(n);
+    for (const Edge& e : edges) {
+        adj[e.from].push_back(e);
+    }
+    // Make a result vector of Nodes and set the path_cost to INT_MAX
+    // and the predecessor to -1. Set the source path_cost to 0
+    vector<Node> result(n);
+    for (int i = 0; i < n; ++i) {
+        result[i].id = i;
+        result[i].path_cost = INT_MAX;
+        result[i].pred = -1;
+    }
+    result[source].path_cost = 0;
+
+    // Use a priority queue to store the nodes to be processed
+    // It is ordered by the path_cost of the nodes, so that the node with the
+    // smallest oath_cost is processed first. We use the greater<Node>
+    // comparator to make the priority queue a min-heap.
+    priority_queue<Node, vector<Node>, greater<Node>> pq;
+    pq.push({source, 0, -1});
+
+    // While the priority queue is not empty, we pop the node with the smallest
+    // path_cost and process it.
+    while (!pq.empty()) {
+        Node cur = pq.top();
+        pq.pop();
+        int u = cur.id;
+
+        if (cur.path_cost > result[u].path_cost) {
+            continue;
+        }
+        // For each neighbor of u, we check if the path_cost to that neighbor can be
+        // improved by going through u. If it can, we update the path_cost and
+        // predecessor of that neighbor and push it onto the priority queue.
+        for (const Edge& e : adj[u]) {
+            int new_cost = result[u].path_cost + e.weight;
+            if (new_cost < result[e.to].path_cost) {
+                result[e.to].path_cost = new_cost;
+                result[e.to].pred = u;
+                pq.push({e.to, new_cost, u});
+            }
+        }
+    }
+    return result;
 }
 
 
@@ -278,6 +352,12 @@ vector<Node> dijkstras_algorithm(int n, vector<Edge> edges, int source) {
 // You must implement this function.
 double heuristic_cost(GridNode start, GridNode dest) {
     // Your code here!
+    int dx = abs(start.x - dest.x);
+    int dy = abs(start.y - dest.y);
+    int diagonal_moves = min(dx, dy);
+    int straight_moves = max(dx, dy) - diagonal_moves;
+    return 1.5 * diagonal_moves + 1.0 * straight_moves;
+
 }
 
 // To test your algorithm with the function "heruistic_cost" above,
@@ -294,6 +374,8 @@ vector<GridNode> a_star_algorithm(
     // Your code here!
     // Be sure to use "h" from the inputs in your implementation; do not
     // directly use "heruistic_cost" above!
+    int total = m * n;
+
 
 }
 
