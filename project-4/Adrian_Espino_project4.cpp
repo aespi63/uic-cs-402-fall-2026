@@ -371,12 +371,91 @@ vector<GridNode> a_star_algorithm(
     function<double(GridNode,GridNode)> h
 ) 
 {
-    // Your code here!
+
     // Be sure to use "h" from the inputs in your implementation; do not
     // directly use "heruistic_cost" above!
     int total = m * n;
+    auto to_id = [m](int x, int y) { return y * m + x; };
 
+    
+    vector<vector<int>> adj(total);
+    for (const GridEdge& e : edges) {
+        adj[to_id(e.from_x, e.from_y)].push_back(to_id(e.to_x, e.to_y));
+    }
 
+   
+    const double INF = numeric_limits<double>::infinity();
+    vector<double> g(total, INF);
+    vector<int> pred(total, -1);
+    vector<bool> closed(total, false);
+
+    int s = to_id(source.x, source.y);
+    int t = to_id(target.x, target.y);
+    g[s] = 0.0;
+
+    
+    priority_queue<pair<double, int>,
+                   vector<pair<double, int>>,
+                   greater<pair<double, int>>> pq;
+    pq.push({0.0 + h(source, target), s});
+
+    
+    while (!pq.empty()) {
+        int u = pq.top().second;
+        pq.pop();
+
+        if (closed[u]) {
+            continue; // already finished, an old, stale entry
+        }
+        closed[u] = true;
+
+        if (u == t) {
+            break; // reached the target, so its g is final
+        }
+
+        int ux = u % m;
+        int uy = u / m;
+
+        for (int v : adj[u]) {
+            int vx = v % m;
+            int vy = v / m;
+
+            // Diagonal if both coordinates change
+            bool diagonal = (vx != ux) && (vy != uy);
+            double weight = diagonal ? 1.5 : 1.0;
+
+            double new_g = g[u] + weight;
+            if (new_g < g[v]) {
+                g[v] = new_g;
+                pred[v] = u;
+                GridNode v_node = {vx, vy, new_g, ux, uy};
+                pq.push({new_g + h(v_node, target), v}); // priority uses f = g + h
+            }
+        }
+    }
+    // if the target node's g value is still INF, it means there is no path from
+    // source to target, so we return an empty vector.
+    if (g[t] == INF) {
+        return {};
+    }
+
+    vector<GridNode> path;
+    for (int cur = t; cur != -1; cur = pred[cur]) {
+        GridNode node;
+        node.x = cur % m;
+        node.y = cur / m;
+        node.path_cost = g[cur];
+        if (pred[cur] == -1) {
+            node.pred_x = -1;
+            node.pred_y = -1;
+        } else {
+            node.pred_x = pred[cur] % m;
+            node.pred_y = pred[cur] / m;
+        }
+        path.push_back(node);
+    }
+    reverse(path.begin(), path.end());
+    return path;
 }
 
 int main() {
